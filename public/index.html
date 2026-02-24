@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Uploader</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        .drop-zone { border: 2px dashed #007bff; border-radius: 10px; padding: 40px; cursor: pointer; background: #f8fbff; transition: 0.3s; }
+        .drop-zone:hover { background: #eef5ff; }
+        #preview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; justify-content: center; }
+        #preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer; width: 100%; }
+        .btn:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Cloud Uploader</h2>
+        <div class="drop-zone" id="dropZone">Drag files here or click</div>
+        <input type="file" id="fileInput" multiple hidden>
+        <div id="preview"></div>
+        <button class="btn" id="uploadBtn" disabled>Upload to Cloud</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const preview = document.getElementById('preview');
+        const status = document.getElementById('status');
+        let selectedFiles = [];
+
+        dropZone.onclick = () => fileInput.click();
+
+        fileInput.onchange = (e) => handleFiles(e.target.files);
+
+        function handleFiles(files) {
+            selectedFiles = [...files];
+            preview.innerHTML = '';
+            selectedFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+            uploadBtn.disabled = false;
+        }
+
+ uploadBtn.onclick = async () => {
+    const formData = new FormData();
+    selectedFiles.forEach(file => formData.append('files', file));
+
+    status.innerHTML = "<i>Uploading to Cloud...</i>";
+    uploadBtn.disabled = true;
+
+    try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if(data.success) {
+            status.innerHTML = "✅ <b>Upload Success!</b>";
+            preview.innerHTML = ""; // Clear previews
+            
+            // Show the new cloud links
+            data.urls.forEach(url => {
+                const linkWrapper = document.createElement('div');
+                linkWrapper.style.margin = "10px 0";
+                linkWrapper.innerHTML = `
+                    <input type="text" value="${url}" readonly style="width:70%; padding:5px;">
+                    <button onclick="copyToClipboard('${url}')" style="padding:5px;">Copy</button>
+                `;
+                preview.appendChild(linkWrapper);
+            });
+        }
+    } catch (err) {
+        status.innerText = "❌ Upload failed.";
+        uploadBtn.disabled = false;
+    }
+};
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert("Link copied to clipboard!");
+}
+    </script>
+</body>
+</html>

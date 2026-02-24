@@ -1,20 +1,30 @@
-// Change this part in your server.js
-const storage = multer.memoryStorage(); // Switch from diskStorage to memoryStorage
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 } 
+require('dotenv').config();
+const express = require('express');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2; // It finds the URL in process.env automatically
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+const app = express();
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'codespace_uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf']
+  },
 });
 
-app.post('/api/upload', upload.array('files', 10), (req, res) => {
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ success: false, message: "No files uploaded" });
+const upload = multer({ storage: storage });
+app.use(express.static('public'));
+
+app.post('/api/upload', upload.array('files', 5), (req, res) => {
+  try {
+    const fileUrls = req.files.map(file => file.path);
+    res.json({ success: true, urls: fileUrls });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-
-  // In a real production app on Vercel, you would now send 
-  // req.files[0].buffer to AWS S3 or Cloudinary.
-  
-  res.status(200).json({ 
-    success: true, 
-    message: "File received in memory! (Note: Vercel does not support permanent local disk storage)" 
-  });
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

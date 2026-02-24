@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Uploader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="upload-container">
+    <h2>Upload Your Files</h2>
+    
+    <div id="drop-zone" class="drop-zone">
+      <p>Drag & Drop files here or <span>click to browse</span></p>
+      <input type="file" id="file-input" multiple hidden>
+    </div>
+
+    <div class="progress-container" id="progress-container" style="display: none;">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <div id="status-message"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

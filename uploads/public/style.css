@@ -1,0 +1,62 @@
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f3f4f6;
+  margin: 0;
+}
+
+.upload-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.drop-zone {
+  border: 2px dashed #3b82f6;
+  padding: 40px 20px;
+  border-radius: 8px;
+  background: #eff6ff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.drop-zone.dragover {
+  background: #bfdbfe;
+  border-color: #2563eb;
+  transform: scale(1.02);
+}
+
+.drop-zone span {
+  color: #2563eb;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.progress-container {
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  margin-top: 20px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #10b981;
+  transition: width 0.2s;
+}
+
+#status-message {
+  margin-top: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
